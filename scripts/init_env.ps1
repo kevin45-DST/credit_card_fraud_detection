@@ -36,7 +36,7 @@ Write-Host =====================================
 Write-Host Creating Jupyter kernel...
 Write-Host =====================================
 
-python -m ipykernel install --user `
+python -m ipykernel install `
     --sys-prefix `
     --name $ProjectName `
     --display-name "Python ($ProjectName)"
