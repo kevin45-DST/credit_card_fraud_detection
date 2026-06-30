@@ -37,6 +37,7 @@ Write-Host Creating Jupyter kernel...
 Write-Host =====================================
 
 python -m ipykernel install --user `
+    --sys-prefix `
     --name $ProjectName `
     --display-name "Python ($ProjectName)"
 
@@ -47,6 +48,27 @@ Write-Host Installing dependencies...
 Write-Host =====================================
 
 pip install -r requirements.txt
+
+Write-Host Done.
+
+Write-Host =====================================
+Write-Host Creating project folders...
+Write-Host =====================================
+
+$folders = @(
+    "data/raw",
+    "data/processed",
+    "logs",
+    "models",
+	"outputs",
+    "notebooks",
+    "src",
+    "tests"
+)
+
+foreach ($folder in $folders) {
+    New-Item -ItemType Directory -Force -Path $folder | Out-Null
+}
 
 Write-Host Done.
 

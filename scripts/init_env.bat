@@ -39,6 +39,7 @@ echo Creating Jupyter kernel...
 echo =====================================
 
 python -m ipykernel install --user `
+    --sys-prefix `
     --name $ProjectName `
     --display-name "Python ($ProjectName)"
 
@@ -51,6 +52,29 @@ echo =====================================
 pip install -r requirements.txt
 
 echo Done.
+
+echo =====================================
+echo Creating project folders...
+echo =====================================
+
+for %%D in (
+    data\raw
+    data\interim
+    data\processed
+    logs
+    models
+	output
+    src
+    tests
+    notebooks
+) do (
+    if not exist "%%D" (
+        mkdir "%%D"
+        echo Created %%D
+    ) else (
+        echo Already exists %%D
+    )
+)
 
 echo =====================================
 echo Environment is ready!
