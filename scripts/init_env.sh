@@ -49,20 +49,6 @@ echo Done.
 
 echo ""
 echo "====================================="
-echo "NoteBook configuration kernel..."
-echo "====================================="
-
-mkdir -p .vscode
-
-cat > .vscode/settings.json <<EOF
-{
-    "python.defaultInterpreterPath": "\${workspaceFolder}/env/bin/python",
-    "jupyter.defaultKernel": "$PROJECT_NAME"
-}
-EOF
-
-echo ""
-echo "====================================="
 echo "Installing dependencies..."
 echo "====================================="
 
