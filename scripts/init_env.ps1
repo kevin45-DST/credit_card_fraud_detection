@@ -44,6 +44,19 @@ python -m ipykernel install --user `
 Write-Host Done.
 
 Write-Host =====================================
+Write-Host NoteBook configuration kernel
+Write-Host =====================================
+
+New-Item -ItemType Directory -Force -Path ".vscode" | Out-Null
+
+@"
+{
+    "python.defaultInterpreterPath": "`${workspaceFolder}/env/Scripts/python.exe",
+    "jupyter.defaultKernel": "$ProjectName"
+}
+"@ | Out-File ".vscode/settings.json" -Encoding utf8
+
+Write-Host =====================================
 Write-Host Installing dependencies...
 Write-Host =====================================
 

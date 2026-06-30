@@ -45,6 +45,22 @@ python -m ipykernel install --user `
 
 echo Done.
 
+echo ""
+echo "====================================="
+echo "NoteBook configuration kernel..."
+echo "====================================="
+
+if not exist ".vscode" (
+    mkdir ".vscode"
+)
+
+(
+echo {
+echo     "python.defaultInterpreterPath": "%%workspaceFolder%%/env/Scripts/python.exe",
+echo     "jupyter.defaultKernel": "%PROJECT_NAME%"
+echo }
+) > .vscode\settings.json
+
 echo =====================================
 echo Installing dependencies...
 echo =====================================
