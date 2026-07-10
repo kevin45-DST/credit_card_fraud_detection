@@ -225,3 +225,9 @@ __marimo__/
 
 # logs
 /logs
+
+# reports
+/reports
+
+# secrets 
+/config/secrets.yaml

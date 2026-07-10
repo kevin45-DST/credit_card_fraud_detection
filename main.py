@@ -1,10 +1,13 @@
 from pathlib import Path
 
+import numpy as np
+from pandas import Series
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
 
 from config.config_manager import ConfigManager
+from src.ml_toolbox.dataset.dataset import Dataset
+from src.ml_toolbox.preprocessing.scaling.basic import BasicScaling
 from src.ml_training.training_pipeline import TrainingPipeline
-from src.ml_training.dataset_manager import DatasetManager
 from src.ml_training.search_pipeline import SearchPipeline
 from src.ml_toolbox.preprocessing.balancing.basic import BasicBalancing
 
@@ -20,23 +23,15 @@ def build_datasets():
     df = pd.read_csv("data/raw/creditcard.csv")
     
     X = df.drop("Class", axis=1)
-    y = df["Class"]
+    y = Series(df["Class"])
     
     X_sample, y_sample = BasicBalancing.smote_tomek(X, y)
+    
+    ds = Dataset("dataset_test", X_sample, y_sample)
+    
+    ds.x_train, ds.x_test, ds.y_train, ds.y_test, scaler = BasicScaling.standard(ds.x_train, ds.x_test, ds.y_train, ds.y_test)
 
-    print(y_sample.value_counts())
-
-    manager = DatasetManager()
-
-    manager.add_dataset(
-        name="raw_dataset",
-        x=X_sample,
-        y=y_sample,
-        test_size=0.2,
-        stratify=True,
-    )
-
-    return manager.get_datasets()
+    return ds
 
 
 def build_models():
@@ -85,7 +80,7 @@ def search():
     scorings = "f1_macro"
 
     pipeline = SearchPipeline(
-        dataset=dataset[0],
+        dataset=dataset,
         models=models,
         param_grids=param_grids,
         report_path=report_path,
@@ -117,7 +112,7 @@ def train():
     dataset = build_datasets()
 
     pipeline = TrainingPipeline(
-        dataset=dataset[0],
+        dataset=dataset,
         model=model,
         model_name=model_name,
         params=params,

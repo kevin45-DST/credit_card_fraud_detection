@@ -5,6 +5,23 @@ from pathlib import Path
 
 
 class MetricTable:
+    
+    """
+    Composant d'affichage des métriques d'expérimentation.
+
+    Cette classe présente les résultats des modèles sous forme de tableau
+    interactif.
+
+    Elle permet notamment :
+
+    - de consulter les métriques disponibles ;
+    - de sélectionner une expérimentation ;
+    - d'afficher des informations complémentaires comme la matrice
+      de confusion.
+
+    Elle ne réalise aucune comparaison automatique ni recommandation de
+    modèle.
+    """
 
     def __init__(
         self,
@@ -19,8 +36,8 @@ class MetricTable:
 
         for _, row in self.metrics.iterrows():
 
-            c1, c2, c3 = st.columns(
-                [7,1,1]
+            c1, c2 = st.columns(
+                [8,1]
             )
 
             with c1:
@@ -32,19 +49,9 @@ class MetricTable:
             with c2:
 
                 if st.button(
-                    "📊",
+                    "👁",
                     key=f"cm_{row['label']}",
                 ):
 
-                    st.session_state["selected_model"] = row["label"]
+                    st.session_state["selected_run"] = row["label"]
                     st.session_state["selected_view"] = "confusion"
-
-            with c3:
-
-                if st.button(
-                    "🧠",
-                    key=f"fi_{row['label']}",
-                ):
-
-                    st.session_state["selected_model"] = row["label"]
-                    st.session_state["selected_view"] = "importance"
