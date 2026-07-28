@@ -8,10 +8,10 @@ from sklearn.metrics import confusion_matrix
 from sklearn.model_selection import GridSearchCV
 from tqdm import tqdm
 
-from src.utils import datetime_Utils
+from src.utils.ids_utils import ExperimentId
 
-from ..ml_toolbox.dataset.dataset import Dataset
-from .report_manager import ReportManager, SearchTrainingResult
+from ..ml_toolbox.data.dataset.dataset import Dataset
+from ..ml_toolbox.reporting.report_manager import ReportManager, SearchTrainingResult
     
 class SearchPipeline:
     """
@@ -90,7 +90,6 @@ class SearchPipeline:
         dataset: Dataset,
         models: dict[str, Any],
         param_grids: dict[str, dict],
-        report_path: str | Path,
         scorings: str | list[str],
         cv: int = 5,
         n_jobs: int = -1,
@@ -105,9 +104,8 @@ class SearchPipeline:
             self.scorings = scorings
         self.cv = cv
         self.n_jobs = n_jobs
-        
-        self.report_manager = ReportManager(report_path)
-        
+
+        self.report_manager = ReportManager(exp_id = ExperimentId.create(), mode="search")
         
     def train_with_gridsearch(self) -> list[SearchTrainingResult]:
         """
@@ -193,7 +191,6 @@ class SearchPipeline:
         """
 
         results = self.train_with_gridsearch()
-        now = datetime_Utils.DateTimeUtils.now('timestamp')
         print("Début du report")
-        self.report_manager.generate_metrics(results, np.unique(self.dataset.y_test).tolist(), now)
+        self.report_manager.generate_metrics(results, np.unique(self.dataset.y_test).tolist())
         print("Fin du report")

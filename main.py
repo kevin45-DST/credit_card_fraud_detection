@@ -1,15 +1,11 @@
-from pathlib import Path
-
-import numpy as np
 from pandas import Series
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
 
-from config.config_manager import ConfigManager
-from src.ml_toolbox.dataset.dataset import Dataset
-from src.ml_toolbox.preprocessing.scaling.basic import BasicScaling
-from src.ml_training.training_pipeline import TrainingPipeline
-from src.ml_training.search_pipeline import SearchPipeline
-from src.ml_toolbox.preprocessing.balancing.basic import BasicBalancing
+from src.ml_toolbox.data.dataset.dataset import Dataset
+from src.ml_toolbox.training.preprocessing.scaling.basic import BasicScaling
+from src.ml_pipeline.training_pipeline import TrainingPipeline
+from src.ml_pipeline.search_pipeline import SearchPipeline
+from src.ml_toolbox.training.preprocessing.balancing.basic import BasicBalancing
 
 import pandas as pd
 
@@ -25,7 +21,8 @@ def build_datasets():
     X = df.drop("Class", axis=1)
     y = Series(df["Class"])
     
-    X_sample, y_sample = BasicBalancing.smote_tomek(X, y)
+    X_sample, y_sample = BasicBalancing.random_undersampling(X, y)
+    #X_sample, y_sample = BasicBalancing.smote_tomek(X, y)
     
     ds = Dataset("dataset_test", X_sample, y_sample)
     
@@ -63,14 +60,7 @@ def build_param_grids():
 
     
 def search():
-    
-    config = ConfigManager(
-            "config/paths.yaml"
-        )
-    report_path = config.get(
-            "reports.search"
-        )
-    
+       
     print("Starting training pipeline...")
 
     dataset = build_datasets()
@@ -83,7 +73,6 @@ def search():
         dataset=dataset,
         models=models,
         param_grids=param_grids,
-        report_path=report_path,
         scorings=scorings,
         cv=5,
     )
@@ -93,15 +82,6 @@ def search():
     print("Training finished.")
     
 def train():
-    
-    config = ConfigManager(
-            "config/paths.yaml"
-        )
-
-    report_path = config.get(
-            "reports.training"
-        )
-    models_path = config.get("models.path")
     
     print("Starting training pipeline...")
 
@@ -115,9 +95,7 @@ def train():
         dataset=dataset,
         model=model,
         model_name=model_name,
-        params=params,
-        report_path=report_path,
-        candidate_path=models_path
+        params=params
     )
 
     pipeline.run()
@@ -125,8 +103,8 @@ def train():
     print("Training finished.")
 
 def main():
-    search()
-    #train()
+    #search()
+    train()
 
 if __name__ == "__main__":
     main()

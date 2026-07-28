@@ -1,16 +1,19 @@
 from __future__ import annotations
 
 from pathlib import Path
+import time
 from typing import Any
 
 import joblib
 import numpy as np
 from sklearn.metrics import confusion_matrix
 
+from config.config_manager import ConfigManager
 from src.utils import datetime_Utils
+from src.utils.ids_utils import ExperimentId
 
-from ..ml_toolbox.dataset.dataset import Dataset
-from .report_manager import ReportManager, TrainingResult
+from ..ml_toolbox.data.dataset.dataset import Dataset
+from ..ml_toolbox.reporting.report_manager import ReportManager, TrainingResult
     
 class TrainingPipeline:
     """
@@ -73,18 +76,22 @@ class TrainingPipeline:
         dataset: Dataset,
         model: Any,
         model_name: str,
-        params: dict[str, Any],
-        report_path: str | Path,
-        candidate_path: str | Path,
+        params: dict[str, Any]
     ) -> None:
 
         self.dataset = dataset
         self.model = model
         self.model_name = model_name
         self.params = params
-        self.candidate_path = candidate_path
         
-        self.report_manager = ReportManager(report_path)
+        config = ConfigManager(
+            "config/paths.yaml"
+        )
+
+        self.candidate_path = Path(config.get("project.root")) / config.get("models.root")
+        self.exp_id = ExperimentId.create()
+        
+        self.report_manager = ReportManager(exp_id = self.exp_id, mode="training")
         
     def train(self) -> TrainingResult:
 
@@ -141,15 +148,24 @@ class TrainingPipeline:
         supérieur (par exemple un futur Decision Helper).
         """
 
+        # Top démarrage entrainement
+        start_time = time.perf_counter()
         result = self.train()
+        # top fin d'entrainement
+        end_time = time.perf_counter()
+        # calcul de la durée d'entrainement
+        duration = end_time - start_time
+        
         now = datetime_Utils.DateTimeUtils.now('timestamp')
-        self.report_manager.generate_metrics(result, np.unique(self.dataset.y_test).tolist(), now)
+        self.report_manager.generate_metrics(result, np.unique(self.dataset.y_test).tolist(), duration)
                
         file_name = (
             f"{self.model_name}_"
             f"{now}"
             ".joblib"
         )
-        
-        file_path = Path(self.candidate_path) / f"{file_name}"
-        joblib.dump(self.model, file_path)
+        file_path = Path(self.candidate_path) / self.exp_id.id
+        file_path.mkdir(parents=True, exist_ok=True)
+        file_name_path =  file_path / f"{file_name}"
+
+        joblib.dump(self.model, file_name_path)

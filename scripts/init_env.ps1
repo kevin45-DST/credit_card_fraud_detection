@@ -1,4 +1,10 @@
+Set-Location ..
+
 $ProjectName = Split-Path -Leaf $PWD
+
+Write-Host =====================================
+Write-Host Executing "in $ProjectName"
+Write-Host =====================================
 
 Write-Host =====================================
 Write-Host Creating virtual environment...
@@ -63,7 +69,8 @@ $folders = @(
 	"outputs",
     "notebooks",
     "src",
-    "tests"
+    "tests",
+    "config"
 )
 
 foreach ($folder in $folders) {
@@ -71,6 +78,30 @@ foreach ($folder in $folders) {
 }
 
 Write-Host Done.
+
+Write-Host =====================================
+Write-Host initialisation paths.yaml...
+Write-Host =====================================
+
+$ProjectRoot = (Get-Location).Path -replace "\\", "/"
+
+@"
+project:
+  root: "$projectRoot"
+
+data:
+  root: data 
+  raw: raw
+  processed: processed
+
+models:
+  root: models
+
+reports:
+  root: reports
+  search: search
+  training: training
+"@ | Set-Content "config/paths.yaml"
 
 Write-Host =====================================
 Write-Host Environment is ready!

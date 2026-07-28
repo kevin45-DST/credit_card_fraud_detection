@@ -1,3 +1,0 @@
-label,model,scoring,best_score,accuracy,precision,recall,f1,best_params
-RandomForestClassifier_f1_macro,RandomForestClassifier,f1_macro,0.999889879676821,0.999832618290416,0.9996829478801543,0.9999823807174572,0.9998326418800483,"{'max_depth': None, 'n_estimators': 100}"
-GradientBoostingClassifier_f1_macro,GradientBoostingClassifier,f1_macro,0.9947406382573265,0.9949609295851577,0.996605854900297,0.9933046726337303,0.9949525255021002,"{'learning_rate': 0.1, 'n_estimators': 200}"

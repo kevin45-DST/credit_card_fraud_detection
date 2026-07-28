@@ -1,6 +1,12 @@
 @echo off
 
+cd ..
+
 for %%I in (.) do set ProjectName=%%~nxI
+
+echo =====================================
+echo Executing in %$ProjectName%
+echo =====================================
 
 echo =====================================
 echo Creating virtual environment...
@@ -67,6 +73,7 @@ for %%D in (
     src
     tests
     notebooks
+    config
 ) do (
     if not exist "%%D" (
         mkdir "%%D"
@@ -75,6 +82,27 @@ for %%D in (
         echo Already exists %%D
     )
 )
+
+echo =====================================
+echo initialisation paths.yaml...
+echo =====================================
+
+set "PROJECT_ROOT=%PROJECT_ROOT:\=/%"
+echo project:> config\paths.yaml
+echo   root: "%PROJECT_ROOT%">> config\paths.yaml
+echo. >> config\paths.yaml
+echo data:>> config\paths.yaml
+echo   root: data>> config\paths.yaml
+echo   raw: raw>> config\paths.yaml
+echo   processed: processed>> config\paths.yaml
+echo. >> config\paths.yaml
+echo models:>> config\paths.yaml
+echo   root: models>> config\paths.yaml
+echo. >> config\paths.yaml
+echo reports:>> config\paths.yaml
+echo   root: reports>> config\paths.yaml
+echo   search: search>> config\paths.yaml
+echo   training: training>> config\paths.yaml
 
 echo =====================================
 echo Environment is ready!

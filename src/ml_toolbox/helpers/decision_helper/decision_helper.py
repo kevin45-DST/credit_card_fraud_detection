@@ -4,7 +4,7 @@ from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parent.parent.parent.parent))
 
-from src.ml_toolbox.decision_helper.launcher import Launcher
+from ml_toolbox.helpers.decision_helper.launcher import Launcher
 from config.config_manager import ConfigManager
 
 
@@ -45,7 +45,7 @@ class DecisionHelper:
         report_path = config.get(
                 "reports.search"
                 )
-        self.report_path = Path(report_path)
+        self.report_path = Path(config.get("project.root")) / config.get("reports.root") / config.get("reports.search")
 
     def run(self) -> None:
 

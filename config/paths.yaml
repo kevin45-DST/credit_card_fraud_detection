@@ -1,10 +1,15 @@
+project:
+  root: "D:/projets/credit_card_fraud_detection"
+
 data:
-  raw: data/raw
-  processed: data/processed
+  root: data 
+  raw: raw
+  processed: processed
 
 models:
-  path: models
+  root: models
 
 reports:
-  search: reports/search
-  training: reports/training
+  root: reports
+  search: search
+  training: training
