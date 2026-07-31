@@ -231,3 +231,6 @@ __marimo__/
 
 # secrets 
 /config/secrets.yaml
+
+#tracking
+/tracking

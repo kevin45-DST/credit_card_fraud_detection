@@ -89,22 +89,22 @@ echo =====================================
 echo initialisation paths.yaml...
 echo =====================================
 
-PROJECT_ROOT="$(pwd)"
+PROJECT_root_folder="$(pwd)"
 
 cat > config/paths.yaml <<EOF
 project:
-  root: "$PROJECT_ROOT"
+  root_folder: "$PROJECT_root_folder"
 
 data:
-  root: data 
+  root_folder: data 
   raw: raw
   processed: processed
 
 models:
-  root: models
+  root_folder: models
 
 reports:
-  root: reports
+  root_folder: reports
   search: search
   training: training
 EOF

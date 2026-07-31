@@ -83,22 +83,22 @@ Write-Host =====================================
 Write-Host initialisation paths.yaml...
 Write-Host =====================================
 
-$ProjectRoot = (Get-Location).Path -replace "\\", "/"
+$Projectroot_folder = (Get-Location).Path -replace "\\", "/"
 
 @"
 project:
-  root: "$projectRoot"
+  root_folder: "$projectroot_folder"
 
 data:
-  root: data 
+  root_folder: data 
   raw: raw
   processed: processed
 
 models:
-  root: models
+  root_folder: models
 
 reports:
-  root: reports
+  root_folder: reports
   search: search
   training: training
 "@ | Set-Content "config/paths.yaml"

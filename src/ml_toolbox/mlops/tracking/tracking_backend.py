@@ -13,12 +13,22 @@ class TrackingBackend(ABC):
     (MLflow, Weights & Biases, Azure ML...).
 
     Chaque backend doit gérer :
-    - l'ouverture d'une expérience ;
-    - l'enregistrement des paramètres ;
-    - l'enregistrement des métriques ;
-    - l'enregistrement des artefacts.
+    - La création d'une experience
+    - l'ouverture d'une expérience 
+    - l'enregistrement des paramètres 
+    - l'enregistrement des métriques 
+    - l'enregistrement des artefacts
     """
-
+       
+    @abstractmethod
+    def initialize_experiment(
+        self
+    ) -> None:
+        """
+        Crée une expérience de tracking.
+        """
+        pass
+    
     @abstractmethod
     def start_run(
         self,

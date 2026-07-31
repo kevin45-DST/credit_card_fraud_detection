@@ -3,7 +3,7 @@ from datetime import datetime
 
 
 @dataclass(frozen=True)
-class ExperimentId:
+class runId:
 
     id: str
 
@@ -14,5 +14,5 @@ class ExperimentId:
         )
 
         return cls(
-            id=f"experiment_{timestamp}"
+            id=f"run_{timestamp}"
         )

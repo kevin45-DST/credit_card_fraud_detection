@@ -9,7 +9,7 @@ sys.path.append(
 from config.config_manager import ConfigManager
 
 
-class ExperimentRecovery:
+class runRecovery:
     """
     Permet de reconstruire le registre global des expériences
     à partir des registres locaux présents dans chaque dossier
@@ -18,7 +18,7 @@ class ExperimentRecovery:
 
     def __init__(
         self,
-        experiments_path: Path,
+        runs_path: Path,
         global_registry_path: Path,
     ) -> None:
         """
@@ -26,20 +26,20 @@ class ExperimentRecovery:
 
         Parameters
         ----------
-        experiments_path : Path
+        runs_path : Path
             Dossier contenant les différentes expériences.
 
         global_registry_path : Path
-            Chemin du fichier 'experiments_registry.json' à reconstruire.
+            Chemin du fichier 'runs_registry.json' à reconstruire.
         """
 
-        self.experiments_path = experiments_path
+        self.runs_path = runs_path
         self.global_registry_path = global_registry_path
 
     def recover(self) -> list[dict]:
         """
         Parcourt les dossiers d'expériences et récupère les informations
-        contenues dans chaque fichier 'experiment_registry.json'.
+        contenues dans chaque fichier 'run_registry.json'.
 
         Returns
         -------
@@ -47,54 +47,54 @@ class ExperimentRecovery:
             Liste des expériences récupérées.
         """
 
-        experiments = []
+        runs = []
 
-        if not self.experiments_path.exists():
-            return experiments
+        if not self.runs_path.exists():
+            return runs
 
-        for experiment_dir in self.experiments_path.iterdir():
+        for run_dir in self.runs_path.iterdir():
 
-            if not experiment_dir.is_dir():
+            if not run_dir.is_dir():
                 continue
 
-            if not experiment_dir.name.startswith(
-                "experiment_"
+            if not run_dir.name.startswith(
+                "run_"
             ):
                 continue
 
             registry_path = (
-                experiment_dir
-                / "experiment_registry.json"
+                run_dir
+                / "run_registry.json"
             )
 
             if not registry_path.exists():
                 continue
 
-            experiment = self._load_registry(
+            run = self._load_registry(
                 registry_path
             )
 
-            if experiment:
-                experiments.append(experiment)
+            if run:
+                runs.append(run)
 
-        return experiments
+        return runs
 
     def rebuild_global_registry(
         self,
-        experiments: list[dict],
+        runs: list[dict],
     ) -> None:
         """
-        Reconstruit le fichier 'experiments_registry.json'
+        Reconstruit le fichier 'runs_registry.json'
         à partir de la liste des expériences récupérées.
 
         Parameters
         ----------
-        experiments : list[dict]
+        runs : list[dict]
             Liste des expériences à enregistrer dans le registre global.
         """
 
         registry = {
-            "experiments": experiments
+            "runs": runs
         }
 
         self.global_registry_path.parent.mkdir(
@@ -103,7 +103,7 @@ class ExperimentRecovery:
         )
 
         with open(
-            self.global_registry_path / "experiments_registry.json",
+            self.global_registry_path / "runs_registry.json",
             "w",
             encoding="utf-8",
         ) as file:
@@ -121,7 +121,7 @@ class ExperimentRecovery:
 
         Cette méthode récupère les informations contenues dans les
         registres locaux de chaque expérience puis génère un nouveau
-        fichier 'experiments_registry.json'.
+        fichier 'runs_registry.json'.
 
         Returns
         -------
@@ -129,13 +129,13 @@ class ExperimentRecovery:
             Liste des expériences récupérées.
         """
 
-        experiments = self.recover()
+        runs = self.recover()
 
         self.rebuild_global_registry(
-            experiments
+            runs
         )
 
-        return experiments
+        return runs
 
     @staticmethod
     def _load_registry(
@@ -147,7 +147,7 @@ class ExperimentRecovery:
         Parameters
         ----------
         registry_path : Path
-            Chemin vers le fichier 'experiment_registry.json'.
+            Chemin vers le fichier 'run_registry.json'.
 
         Returns
         -------
@@ -174,17 +174,17 @@ def main() -> None:
             "config/paths.yaml"
         )
 
-    training_path = Path(config.get("project.root")) / config.get("reports.root") / config.get("reports.training")
+    training_path = Path(config.get("project.root_folder")) / config.get("reports.root_folder") / config.get("reports.training")
 
-    recovery = ExperimentRecovery(
-        experiments_path = training_path,
+    recovery = runRecovery(
+        runs_path = training_path,
         global_registry_path = training_path,
     )
 
-    experiments = recovery.recover_and_rebuild()
+    runs = recovery.recover_and_rebuild()
 
     print(
-        f"{len(experiments)} experiments_registry restauré."
+        f"{len(runs)} runs_registry restauré."
     )
 
 

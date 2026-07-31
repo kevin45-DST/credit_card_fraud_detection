@@ -45,7 +45,7 @@ class DecisionHelper:
         report_path = config.get(
                 "reports.search"
                 )
-        self.report_path = Path(config.get("project.root")) / config.get("reports.root") / config.get("reports.search")
+        self.report_path = Path(config.get("project.root_folder")) / config.get("reports.root_folder") / config.get("reports.search")
 
     def run(self) -> None:
 

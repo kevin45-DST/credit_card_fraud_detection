@@ -87,20 +87,20 @@ echo =====================================
 echo initialisation paths.yaml...
 echo =====================================
 
-set "PROJECT_ROOT=%PROJECT_ROOT:\=/%"
+set "PROJECT_root_folder=%PROJECT_root_folder:\=/%"
 echo project:> config\paths.yaml
-echo   root: "%PROJECT_ROOT%">> config\paths.yaml
+echo   root_folder: "%PROJECT_root_folder%">> config\paths.yaml
 echo. >> config\paths.yaml
 echo data:>> config\paths.yaml
-echo   root: data>> config\paths.yaml
+echo   root_folder: data>> config\paths.yaml
 echo   raw: raw>> config\paths.yaml
 echo   processed: processed>> config\paths.yaml
 echo. >> config\paths.yaml
 echo models:>> config\paths.yaml
-echo   root: models>> config\paths.yaml
+echo   root_folder: models>> config\paths.yaml
 echo. >> config\paths.yaml
 echo reports:>> config\paths.yaml
-echo   root: reports>> config\paths.yaml
+echo   root_folder: reports>> config\paths.yaml
 echo   search: search>> config\paths.yaml
 echo   training: training>> config\paths.yaml
 

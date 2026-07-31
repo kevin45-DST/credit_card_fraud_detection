@@ -10,7 +10,7 @@ from sklearn.metrics import confusion_matrix
 
 from config.config_manager import ConfigManager
 from src.utils import datetime_Utils
-from src.utils.ids_utils import ExperimentId
+from src.utils.ids_utils import runId
 
 from ..ml_toolbox.data.dataset.dataset import Dataset
 from ..ml_toolbox.reporting.report_manager import ReportManager, TrainingResult
@@ -88,8 +88,8 @@ class TrainingPipeline:
             "config/paths.yaml"
         )
 
-        self.candidate_path = Path(config.get("project.root")) / config.get("models.root")
-        self.exp_id = ExperimentId.create()
+        self.candidate_path = Path(config.get("project.root_folder")) / config.get("models.root_folder")
+        self.exp_id = runId.create()
         
         self.report_manager = ReportManager(exp_id = self.exp_id, mode="training")
         

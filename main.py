@@ -1,6 +1,7 @@
 from pandas import Series
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
 
+from src.ml_pipeline.tracking_pipeline import TrackingPipeline
 from src.ml_toolbox.data.dataset.dataset import Dataset
 from src.ml_toolbox.training.preprocessing.scaling.basic import BasicScaling
 from src.ml_pipeline.training_pipeline import TrainingPipeline
@@ -101,10 +102,22 @@ def train():
     pipeline.run()
 
     print("Training finished.")
+    
+def track():
+    
+    print("Starting tracking pipeline...")
+    
+    tracking_pipeline = TrackingPipeline()
+    
+    tracking_pipeline.run()
+    
+    print("Tracking finished.")
 
 def main():
     #search()
     train()
+    
+    track()
 
 if __name__ == "__main__":
     main()

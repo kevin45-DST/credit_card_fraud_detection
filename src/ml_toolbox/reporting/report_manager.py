@@ -3,9 +3,11 @@ from dataclasses import dataclass
 import json
 from pathlib import Path
 from typing import Any, List
+from matplotlib import pyplot as plt
 import pandas as pd
 
 from sklearn.metrics import (
+    ConfusionMatrixDisplay,
     accuracy_score,
     f1_score,
     precision_score,
@@ -13,7 +15,7 @@ from sklearn.metrics import (
 )
 
 from config.config_manager import ConfigManager
-from src.utils.ids_utils import ExperimentId
+from src.utils.ids_utils import runId
 
 @dataclass(slots=True)
 class SearchTrainingResult:
@@ -119,17 +121,17 @@ class ReportManager:
     les composants dédiés comme DecisionHelper.
     """
 
-    def __init__(self, exp_id: ExperimentId, mode: str = "training") -> None:
+    def __init__(self, exp_id: runId, mode: str = "training") -> None:
         config = ConfigManager(
             "config/paths.yaml"
         )
         if mode == "training":
-            self.reports_path = Path(config.get("project.root")) / config.get("reports.root") / config.get("reports.training")
+            self.reports_path = Path(config.get("project.root_folder")) / config.get("reports.root_folder") / config.get("reports.training")
         elif mode == "search":
-            self.reports_path = Path(config.get("project.root")) / config.get("reports.root") / config.get("reports.search")
+            self.reports_path = Path(config.get("project.root_folder")) / config.get("reports.root_folder") / config.get("reports.search")
             
-        self.reports_experiment_path = self.reports_path / exp_id.id
-        self.reports_experiment_path.mkdir(parents=True, exist_ok=True)
+        self.reports_run_path = self.reports_path / exp_id.id
+        self.reports_run_path.mkdir(parents=True, exist_ok=True)
         self.id = exp_id.id
         self.mode = mode
 
@@ -192,7 +194,7 @@ class ReportManager:
 
             df = pd.DataFrame(rows)
 
-            df.to_csv(self.reports_experiment_path / f"report.csv", index=False)
+            df.to_csv(self.reports_run_path / f"report.csv", index=False)
             
         elif self.mode == "training" and isinstance(results, TrainingResult):
             
@@ -208,28 +210,28 @@ class ReportManager:
             
             df = pd.DataFrame(rows)
 
-            df.to_csv(self.reports_experiment_path / f"report.csv", index=False)
+            df.to_csv(self.reports_run_path / f"report.csv", index=False)
             
             metadata =     {
-                "experiment_id": self.id,
-                "experiment_type": "training",
+                "run_id": self.id,
+                "run_type": "training",
                 "created_at": self.id[11:],
                 "duration": duration,
-                "report_file": str(self.reports_experiment_path / f"report.csv"),
+                "report_file": str(self.reports_run_path / f"report.csv"),
                 "confusion_matrix_file": str(matrix_file)
             }
 
-            self.generate_metadata(self.reports_experiment_path, metadata=metadata)
+            self.generate_metadata(self.reports_run_path, metadata=metadata)
             
             registry_data = {
-                "experiment_id": self.id
+                "run_id": self.id
             }
             
             self.generate_registry(registry_data)
             
-            self.update_experiments_registry(registry_data)
+            self.update_runs_registry(registry_data)
 
-        return self.reports_experiment_path
+        return self.reports_run_path
     
     def generate_confusion_matrix(
         self,
@@ -272,13 +274,14 @@ class ReportManager:
         }
 
         file_path = (
-            self.reports_experiment_path
+            self.reports_run_path
                 / "confusion_matrix"
                 / f"{label}_confusion_matrix.json"
             )
         
-        (self.reports_experiment_path / "confusion_matrix").mkdir(parents=True, exist_ok=True)
+        (self.reports_run_path / "confusion_matrix").mkdir(parents=True, exist_ok=True)
 
+        # Enregistrement de la matrice de confusion en json
         with open(
             file_path,
             "w",
@@ -289,6 +292,35 @@ class ReportManager:
                 file,
                 indent=4,
             )
+            
+        # Enregistrement de la matrice de confusion en format image pour le tracking
+        file_path = (
+            self.reports_run_path
+            / "artifacts"
+            / f"{label}_confusion_matrix.png"
+        )
+
+        file_path.parent.mkdir(
+            parents=True,
+            exist_ok=True,
+        )
+
+        display = ConfusionMatrixDisplay(
+            confusion_matrix=matrix,
+            display_labels=classes,
+        )
+
+        display.plot()
+
+        display.figure_.savefig(
+            file_path,
+            bbox_inches="tight",
+            dpi=300,
+        )
+
+        plt.close(
+            display.figure_
+        )
 
         return file_path
     
@@ -389,7 +421,7 @@ class ReportManager:
             registry_data: dict,
         ) -> None:
             """
-            Génère le fichier experiment_registry.json associé à l'expérience.
+            Génère le fichier run_registry.json associé à l'expérience.
     
             Parameters
             ----------
@@ -399,8 +431,8 @@ class ReportManager:
             """
     
             registry_file = (
-                self.reports_experiment_path
-                / "experiment_registry.json"
+                self.reports_run_path
+                / "run_registry.json"
             )
     
             with open(
@@ -416,14 +448,14 @@ class ReportManager:
                     ensure_ascii=False,
                 )
                 
-    def update_experiments_registry(
+    def update_runs_registry(
             self,
             registry_data: dict,
         ) -> None:
         """
         Met à jour le registre global des expériences.
 
-        Si le fichier experiments_registry.json n'existe pas,
+        Si le fichier runs_registry.json n'existe pas,
         il est créé avec la nouvelle expérience.
 
         Si le fichier existe, la nouvelle expérience est ajoutée
@@ -433,47 +465,47 @@ class ReportManager:
 
         Parameters
         ----------
-        experiment_data : dict
+        run_data : dict
             Informations de suivi de l'expérience.
             Exemple :
             {
-                "experiment_id": "experiment_20260728_145612",
+                "run_id": "run_20260728_145612",
                 "training_status": "Done"
             }
         """
 
-        registry_path = self.reports_path / "experiments_registry.json"
+        registry_path = self.reports_path / "runs_registry.json"
 
         # Création du registre s'il n'existe pas
         if registry_path.exists():
             with open(registry_path, "r", encoding="utf-8") as file:
                 registry = json.load(file)
         else:
-            registry = {"experiments": []}
+            registry = {"runs": []}
 
 
-        experiments = registry.get("experiments", [])
+        runs = registry.get("runs", [])
         
-        experiment_id = registry_data.get("experiment_id")
+        run_id = registry_data.get("run_id")
 
         # Recherche d'une expérience existante
-        existing_experiment = next(
+        existing_run = next(
             (
-                experiment
-                for experiment in experiments
-                if experiment.get("experiment_id") == experiment_id
+                run
+                for run in runs
+                if run.get("run_id") == run_id
             ),
             None,
         )
 
-        if existing_experiment:
+        if existing_run:
             # Mise à jour des informations existantes
-            existing_experiment.update(registry_data)
+            existing_run.update(registry_data)
         else:
             # Ajout d'une nouvelle expérience
-            experiments.append(registry_data)
+            runs.append(registry_data)
 
-        registry["experiments"] = experiments
+        registry["runs"] = runs
 
         with open(registry_path, "w", encoding="utf-8") as file:
             json.dump(
@@ -486,9 +518,9 @@ class ReportManager:
     import json
 
 
-    def update_experiment_status(
+    def update_run_status(
         self,
-        experiment_id: str,
+        run_id: str,
         status_name: str,
         status_value: str,
     ) -> None:
@@ -500,7 +532,7 @@ class ReportManager:
 
         Parameters
         ----------
-        experiment_id : str
+        run_id : str
             Identifiant de l'expérience.
 
         status_name : str
@@ -519,8 +551,8 @@ class ReportManager:
         # -------------------------
 
         local_registry_path = (
-            self.reports_experiment_path
-            / "experiment_registry.json"
+            self.reports_run_path
+            / "run_registry.json"
         )
 
         with open(local_registry_path, "r", encoding="utf-8") as file:
@@ -542,17 +574,17 @@ class ReportManager:
 
         global_registry_path = (
             self.reports_path
-            / "experiments_registry.json"
+            / "runs_registry.json"
         )
 
         with open(global_registry_path, "r", encoding="utf-8") as file:
             global_registry = json.load(file)
 
-        experiments = global_registry.get("experiments", [])
+        runs = global_registry.get("runs", [])
 
-        for experiment in experiments:
-            if experiment.get("experiment_id") == experiment_id:
-                experiment[status_name] = status_value
+        for run in runs:
+            if run.get("run_id") == run_id:
+                run[status_name] = status_value
                 break
 
         with open(global_registry_path, "w", encoding="utf-8") as file:
@@ -566,9 +598,9 @@ class ReportManager:
     import json
 
 
-    def get_experiment_registry(
+    def get_run_registry(
         self,
-        experiment_id: str,
+        run_id: str,
     ) -> dict:
         """
         Récupère les informations de suivi d'une expérience.
@@ -578,7 +610,7 @@ class ReportManager:
 
         Parameters
         ----------
-        experiment_id : str
+        run_id : str
             Identifiant de l'expérience recherchée.
 
         Returns
@@ -592,21 +624,21 @@ class ReportManager:
             Si le registre local de l'expérience n'existe pas.
         """
 
-        experiment_path = (
+        run_path = (
             self.reports_path
             / "training"
-            / experiment_id
-            / "experiment_registry.json"
+            / run_id
+            / "run_registry.json"
         )
 
-        if not experiment_path.exists():
+        if not run_path.exists():
             raise FileNotFoundError(
-                f"Le registre de l'expérience '{experiment_id}' "
-                f"est introuvable : {experiment_path}"
+                f"Le registre de l'expérience '{run_id}' "
+                f"est introuvable : {run_path}"
             )
 
         with open(
-            experiment_path,
+            run_path,
             "r",
             encoding="utf-8",
         ) as file:

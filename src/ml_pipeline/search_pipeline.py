@@ -8,7 +8,7 @@ from sklearn.metrics import confusion_matrix
 from sklearn.model_selection import GridSearchCV
 from tqdm import tqdm
 
-from src.utils.ids_utils import ExperimentId
+from src.utils.ids_utils import runId
 
 from ..ml_toolbox.data.dataset.dataset import Dataset
 from ..ml_toolbox.reporting.report_manager import ReportManager, SearchTrainingResult
@@ -105,7 +105,7 @@ class SearchPipeline:
         self.cv = cv
         self.n_jobs = n_jobs
 
-        self.report_manager = ReportManager(exp_id = ExperimentId.create(), mode="search")
+        self.report_manager = ReportManager(exp_id = runId.create(), mode="search")
         
     def train_with_gridsearch(self) -> list[SearchTrainingResult]:
         """
