@@ -105,7 +105,7 @@ class SearchPipeline:
         self.cv = cv
         self.n_jobs = n_jobs
 
-        self.report_manager = ReportManager(exp_id = runId.create(), mode="search")
+        self.report_manager = ReportManager(run_id = runId.create(), mode="search")
         
     def train_with_gridsearch(self) -> list[SearchTrainingResult]:
         """

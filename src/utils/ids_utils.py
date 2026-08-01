@@ -5,14 +5,10 @@ from datetime import datetime
 @dataclass(frozen=True)
 class runId:
 
-    id: str
-
-    @classmethod
-    def create(cls):
+    @staticmethod
+    def create() -> str:
         timestamp = datetime.now().strftime(
             "%Y%m%d_%H%M%S%f"
         )
 
-        return cls(
-            id=f"run_{timestamp}"
-        )
+        return f"run_{timestamp}"

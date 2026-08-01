@@ -89,9 +89,9 @@ class TrainingPipeline:
         )
 
         self.candidate_path = Path(config.get("project.root_folder")) / config.get("models.root_folder")
-        self.exp_id = runId.create()
+        self.run_id = runId.create()
         
-        self.report_manager = ReportManager(exp_id = self.exp_id, mode="training")
+        self.report_manager = ReportManager(run_id = self.run_id, mode="training")
         
     def train(self) -> TrainingResult:
 
@@ -164,7 +164,7 @@ class TrainingPipeline:
             f"{now}"
             ".joblib"
         )
-        file_path = Path(self.candidate_path) / self.exp_id.id
+        file_path = Path(self.candidate_path) / self.run_id
         file_path.mkdir(parents=True, exist_ok=True)
         file_name_path =  file_path / f"{file_name}"
 

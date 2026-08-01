@@ -66,7 +66,7 @@ class MLFlowBackend(TrackingBackend):
     ) -> None:
         
         experiment = mlflow.get_experiment_by_name(self.experiment_name)
-        print(f"{self.experiment_name = }, {self.artifact_location = }")
+
         if experiment is None:
             self.experiment_id = mlflow.create_experiment(
                 name=self.experiment_name,
