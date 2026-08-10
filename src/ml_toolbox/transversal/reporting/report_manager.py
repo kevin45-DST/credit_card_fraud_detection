@@ -186,7 +186,7 @@ class ReportManager:
                         "accuracy": r.metrics["accuracy"],
                         "precision": r.metrics["precision"],
                         "recall": r.metrics["recall"],
-                        "f1": r.metrics["f1"],
+                        "f1_score": r.metrics["f1_score"],
                         "best_params": r.best_params,
                     }
                 )
@@ -198,13 +198,13 @@ class ReportManager:
             df.to_csv(self.reports_run_path / f"report.csv", index=False)
             
         elif self.mode == "training" and isinstance(results, TrainingResult):
-            
+            print(f"{results = }")
             rows = [{
                     "model": results.model_name,
                     "accuracy": results.metrics["accuracy"],
                     "precision": results.metrics["precision"],
                     "recall": results.metrics["recall"],
-                    "f1": results.metrics["f1"],
+                    "f1_score": results.metrics["f1_score"],
                     }]
             
             matrix_file = self.generate_confusion_matrix(results.model_name, labels, results.matrix)
@@ -352,7 +352,7 @@ class ReportManager:
             - accuracy ;
             - precision ;
             - recall ;
-            - f1 ;
+            - f1_score ;
             - f1_macro.
         """
 
@@ -370,7 +370,7 @@ class ReportManager:
                 average="binary",
                 zero_division=0,
             ),
-            "f1": f1_score(
+            "f1_score": f1_score(
                 y_true,
                 y_pred,
                 average="binary",

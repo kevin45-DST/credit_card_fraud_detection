@@ -52,7 +52,7 @@ class MLFlowBackend(TrackingBackend):
         
         artifact_path.mkdir(parents=True, exist_ok=True)
 
-        self.experiment_name = project_config.get("mlflow.experiment_name")
+        self.experiment_name = project_config.get("project.name")
         self.database_uri = (
                             f"{project_config.get('mlflow.backend.type')}"
                             ":///"

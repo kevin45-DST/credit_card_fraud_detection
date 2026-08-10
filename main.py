@@ -2,11 +2,11 @@ from pandas import Series
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
 
 from src.ml_pipeline.tracking_pipeline import TrackingPipeline
-from src.ml_toolbox.data.dataset.dataset import Dataset
-from src.ml_toolbox.training.preprocessing.scaling.basic import BasicScaling
+from src.ml_toolbox.data_science.data.dataset.dataset import Dataset
+from src.ml_toolbox.data_science.preprocessing.scaling.basic import BasicScaling
 from src.ml_pipeline.training_pipeline import TrainingPipeline
-from src.ml_pipeline.search_pipeline import SearchPipeline
-from src.ml_toolbox.training.preprocessing.balancing.basic import BasicBalancing
+from src.ml_pipeline.search.search_pipeline import SearchPipeline
+from src.ml_toolbox.data_science.preprocessing.balancing.basic import BasicBalancing
 
 import pandas as pd
 
@@ -93,10 +93,7 @@ def train():
     dataset = build_datasets()
 
     pipeline = TrainingPipeline(
-        dataset=dataset,
-        model=model,
-        model_name=model_name,
-        params=params
+        dataset=dataset
     )
 
     pipeline.run()

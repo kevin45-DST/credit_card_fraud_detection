@@ -1,11 +1,7 @@
-from asyncio import exceptions
-import json
 from pathlib import Path
 
-import pandas as pd
-
 from config.config_manager import ConfigManager
-from src.ml_toolbox.reporting import report_manager
+from src.ml_toolbox.transversal.reporting import report_manager
 from src.ml_toolbox.mlops.tracking.tracking_manager import TrackingManager
 
 

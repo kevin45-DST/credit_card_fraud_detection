@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from pathlib import Path
 from typing import Any
 
 import numpy as np
@@ -10,8 +9,8 @@ from tqdm import tqdm
 
 from src.utils.ids_utils import runId
 
-from ..ml_toolbox.data.dataset.dataset import Dataset
-from ..ml_toolbox.reporting.report_manager import ReportManager, SearchTrainingResult
+from src.ml_toolbox.data_science.data.dataset.dataset import Dataset
+from src.ml_toolbox.transversal.reporting.report_manager import ReportManager, SearchTrainingResult
     
 class SearchPipeline:
     """
