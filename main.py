@@ -5,7 +5,7 @@ from src.ml_pipeline.tracking_pipeline import TrackingPipeline
 from src.ml_toolbox.data_science.data.dataset.dataset import Dataset
 from src.ml_toolbox.data_science.preprocessing.scaling.basic import BasicScaling
 from src.ml_pipeline.training_pipeline import TrainingPipeline
-from src.ml_pipeline.search.search_pipeline import SearchPipeline
+from src.ml_pipeline.search_pipeline import SearchPipeline
 from src.ml_toolbox.data_science.preprocessing.balancing.basic import BasicBalancing
 
 import pandas as pd
@@ -62,33 +62,19 @@ def build_param_grids():
     
 def search():
        
-    print("Starting training pipeline...")
+    print("Starting search pipeline...")
 
     dataset = build_datasets()
-    models = build_models()
-    param_grids = build_param_grids()
-    
-    scorings = "f1_macro"
 
-    pipeline = SearchPipeline(
-        dataset=dataset,
-        models=models,
-        param_grids=param_grids,
-        scorings=scorings,
-        cv=5,
-    )
+    pipeline = SearchPipeline(dataset=dataset)
 
     pipeline.run()
 
-    print("Training finished.")
+    print("Search finished.")
     
 def train():
     
     print("Starting training pipeline...")
-
-    model_name = "RandomForestClassifier"
-    model = RandomForestClassifier()
-    params = {'max_depth': None, 'n_estimators': 200}
     
     dataset = build_datasets()
 
@@ -111,10 +97,10 @@ def track():
     print("Tracking finished.")
 
 def main():
-    #search()
-    train()
+    search()
+    #train()
     
-    track()
+    #track()
 
 if __name__ == "__main__":
     main()

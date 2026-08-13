@@ -1,4 +1,7 @@
-from typing import Any, Tuple
+# Copyright © 2026 Kévin DELANOUE
+# License: see LICENSE
+
+from typing import Any
 
 from imblearn.under_sampling import RandomUnderSampler
 from imblearn.over_sampling import RandomOverSampler, SMOTE

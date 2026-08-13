@@ -1,4 +1,6 @@
-# Racine projet pour imports
+# Copyright © 2026 Kévin DELANOUE
+# License: see LICENSE
+
 import sys
 from pathlib import Path
 

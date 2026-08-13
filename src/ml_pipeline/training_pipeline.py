@@ -1,3 +1,6 @@
+# Copyright © 2026 Kévin DELANOUE
+# License: see LICENSE
+
 from __future__ import annotations
 
 import time

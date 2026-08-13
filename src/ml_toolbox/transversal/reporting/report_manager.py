@@ -1,3 +1,6 @@
+# Copyright © 2026 Kévin DELANOUE
+# License: see LICENSE
+
 from __future__ import annotations
 from dataclasses import dataclass
 import json
@@ -16,7 +19,6 @@ from sklearn.metrics import (
 )
 
 from config.config_manager import ConfigManager
-from src.utils.ids_utils import runId
 
 @dataclass(slots=True)
 class SearchTrainingResult:
@@ -198,7 +200,7 @@ class ReportManager:
             df.to_csv(self.reports_run_path / f"report.csv", index=False)
             
         elif self.mode == "training" and isinstance(results, TrainingResult):
-            print(f"{results = }")
+            
             rows = [{
                     "model": results.model_name,
                     "accuracy": results.metrics["accuracy"],

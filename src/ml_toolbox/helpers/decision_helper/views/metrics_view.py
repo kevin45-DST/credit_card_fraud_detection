@@ -1,14 +1,17 @@
+# Copyright © 2026 Kévin DELANOUE
+# License: see LICENSE
+
 from pathlib import Path
 
 import streamlit as st
 import pandas as pd
 
-from widgets.confusion_matrix import ConfusionMatrix
-from widgets.metric_table import MetricTable
+from ml_toolbox.helpers.decision_helper.widgets.confusion_matrix import ConfusionMatrix
+from ml_toolbox.helpers.decision_helper.widgets.metric_table import MetricTable
 
 import sys
 sys.path.append(str(Path(__file__).resolve().parent))
-from loaders.metrics_loader import MetricsLoader
+from ml_toolbox.helpers.decision_helper.loaders.metrics_loader import MetricsLoader
 
 
 class MetricsView:

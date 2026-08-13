@@ -1,5 +1,7 @@
+# Copyright © 2026 Kévin DELANOUE
+# License: see LICENSE
+
 from config.config_manager import ConfigManager
-from .training_backend import TrainingBackend
 from src.utils.imports_utils import ImportsUtils
 
 
@@ -61,7 +63,7 @@ class TrainingRouter:
         model_backend = model_config.get(
             "backend"
         )
-
+        
         model = (
             ImportsUtils.get_class(
                 model_module,

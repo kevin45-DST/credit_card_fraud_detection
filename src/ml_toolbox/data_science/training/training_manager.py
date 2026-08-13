@@ -1,3 +1,5 @@
+# Copyright © 2026 Kévin DELANOUE
+# License: see LICENSE
 
 from typing import Any
 

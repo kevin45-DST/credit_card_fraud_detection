@@ -1,3 +1,6 @@
+# Copyright © 2026 Kévin DELANOUE
+# License: see LICENSE
+
 import streamlit as st
 import pandas as pd
 

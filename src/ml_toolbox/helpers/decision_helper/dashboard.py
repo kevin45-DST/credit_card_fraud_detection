@@ -1,8 +1,11 @@
+# Copyright © 2026 Kévin DELANOUE
+# License: see LICENSE
+
 from pathlib import Path
 
-from loaders.metrics_loader import MetricsLoader
+from ml_toolbox.helpers.decision_helper.loaders.metrics_loader import MetricsLoader
 
-from views.metrics_view import MetricsView
+from ml_toolbox.helpers.decision_helper.views.metrics_view import MetricsView
 
 
 class Dashboard:
