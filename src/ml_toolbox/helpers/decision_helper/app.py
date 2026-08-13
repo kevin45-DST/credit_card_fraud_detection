@@ -6,7 +6,7 @@ import os
 
 import streamlit as st
 
-from ml_toolbox.helpers.decision_helper.dashboard import Dashboard
+from src.ml_toolbox.helpers.decision_helper.dashboard import Dashboard
 
 
 st.set_page_config(

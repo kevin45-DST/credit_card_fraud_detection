@@ -4,9 +4,9 @@
 import sys
 from pathlib import Path
 
-sys.path.append(str(Path(__file__).resolve().parent.parent.parent.parent))
+sys.path.append(str(Path(__file__).resolve().parent.parent.parent.parent.parent))
 
-from ml_toolbox.helpers.decision_helper.launcher import Launcher
+from src.ml_toolbox.helpers.decision_helper.launcher import Launcher
 from config.config_manager import ConfigManager
 
 
@@ -43,9 +43,6 @@ class DecisionHelper:
     ) -> None:
         config = ConfigManager(
                 "config/paths.yaml"
-                )
-        report_path = config.get(
-                "reports.search"
                 )
         self.report_path = Path(config.get("project.root_folder")) / config.get("reports.root_folder") / config.get("reports.search")
 

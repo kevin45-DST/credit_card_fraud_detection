@@ -56,5 +56,5 @@ class MetricTable:
                     key=f"cm_{row['label']}",
                 ):
 
-                    st.session_state["selected_run"] = row["label"]
+                    st.session_state["selected_model"] = row["label"]
                     st.session_state["selected_view"] = "confusion"

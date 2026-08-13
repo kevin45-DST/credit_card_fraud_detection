@@ -73,6 +73,7 @@ class SearchTrainingResult:
     matrix: Any
     best_estimator: Any
     scoring: str
+    best_fit_time: float
     
 @dataclass(slots=True)
 class TrainingResult:
@@ -190,6 +191,7 @@ class ReportManager:
                         "recall": r.metrics["recall"],
                         "f1_score": r.metrics["f1_score"],
                         "best_params": r.best_params,
+                        "best_fit_time": r.best_fit_time
                     }
                 )
                 

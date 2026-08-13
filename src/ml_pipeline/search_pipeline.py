@@ -5,7 +5,7 @@ from __future__ import annotations
 
 import numpy as np
 
-from src.ml_toolbox.transversal.reporting.report_manager import ReportManager, TrainingResult
+from src.ml_toolbox.transversal.reporting.report_manager import ReportManager, SearchTrainingResult
 from src.ml_toolbox.transversal.evaluation.evaluation_manager import EvaluationManager
 from src.ml_toolbox.data_science.best_model_research.strategy.gridcv_strategy import GridCVStrategy
 
@@ -89,12 +89,24 @@ class SearchPipeline:
             
             evaluation_manager = EvaluationManager.create(
                 model=search_strategy.best_model,
-                model_name= model_name,
+                model_name=model_name,
                 dataset=self.dataset,
             )
 
             evaluation = evaluation_manager.evaluate()
+                      
+            search_result = SearchTrainingResult(
+                            best_params=search_strategy.best_params,
+                            scoring=self.scoring,
+                            best_estimator=search_strategy.best_model,
+                            cv_score=search_strategy.best_score,
+                            dataset_name=self.dataset.name,
+                            matrix=evaluation["matrix"],
+                            metrics=evaluation["metrics"],
+                            model_name=model_name,
+                            best_fit_time=search_strategy.best_fit_time
+            )
             
-            results.append(TrainingResult(model_name, evaluation["metrics"], evaluation["matrix"]))
+            results.append(search_result)
             
         self.report_manager.generate_metrics(results, np.unique(self.dataset.y_test).tolist())

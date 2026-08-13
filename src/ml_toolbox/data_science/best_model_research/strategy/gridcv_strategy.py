@@ -93,9 +93,10 @@ class GridCVStrategy:
         self.cv = cv
         self.n_jobs = n_jobs
 
-        self.best_model: Any | None = None
-        self.best_params: dict[str, Any] | None = None
-        self.best_score: float | None = None
+        self.best_model: Any
+        self.best_params: dict[str, Any]
+        self.best_score: float
+        self.best_fit_time: float
 
     def search(
         self,
@@ -136,3 +137,4 @@ class GridCVStrategy:
         self.best_model = search.best_estimator_
         self.best_params = search.best_params_
         self.best_score = search.best_score_
+        self.best_fit_time = search.cv_results_["mean_fit_time"][search.best_index_]
