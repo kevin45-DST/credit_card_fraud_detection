@@ -14,8 +14,22 @@ from src.utils.ids_utils import runId
     
 class SearchPipeline:
     """
-    Pipeline de recherche et comparaison de modèles.
+    Pipeline de recherche et d'évaluation de modèles.
 
+    Cette classe orchestre la recherche d'hyperparamètres pour les modèles
+    configurés, puis évalue chaque meilleur candidat sur le jeu de test.
+
+    Pour chaque modèle :
+
+    1. une stratégie de recherche est exécutée ;
+    2. le meilleur modèle obtenu est évalué ;
+    3. les résultats sont stockés dans un ``SearchTrainingResult``.
+
+    À la fin de la recherche, l'ensemble des résultats est persisté dans
+    un rapport associé à un run unique.
+
+    Le pipeline ne sélectionne pas lui-même un modèle final parmi les
+    différents candidats.
     """
     
     # ==================================================
@@ -43,7 +57,14 @@ class SearchPipeline:
     n_jobs = -1
 
     def __init__(self, dataset: Dataset) -> None:
-        
+        """
+        Initialise un nouveau run de recherche.
+
+        Parameters
+        ----------
+        dataset : Dataset
+            Dataset utilisé pour la recherche et l'évaluation des modèles.
+        """
         self.dataset = dataset
         
         self.report_manager = ReportManager(run_id = runId.create(), mode="search")

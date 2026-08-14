@@ -9,14 +9,48 @@ from src.ml_toolbox.mlops.tracking.tracking_manager import TrackingManager
 
 
 class TrackingPipeline:
+    """
+    Pipeline responsable du suivi des runs non encore trackés.
 
+    Cette classe recherche les runs présents dans le registre global et
+    identifie ceux qui ne possèdent pas encore de statut de tracking.
+
+    Pour chaque run à tracker, elle :
+
+    1. met à jour son statut de tracking ;
+    2. démarre un run auprès du backend de tracking ;
+    3. enregistre les métriques ;
+    4. enregistre les artefacts ;
+    5. met à jour le statut final du run.
+
+    En cas d'erreur, le statut du run est marqué comme ``failed`` et le
+    message de l'exception est enregistré dans son registre.
+
+    Le backend de tracking est fourni par ``TrackingManager``.
+    """
 
     def __init__(self):
-
+        """
+        Initialise le pipeline de tracking.
+        """
         self.tracking_manager = TrackingManager.create()
         
     def get_runs_to_track(self):
-        
+        """
+        Identifie les runs qui doivent encore être trackés.
+
+        La méthode compare le statut de tracking présent dans le registre
+        global et le registre local de chaque run.
+
+        Les incohérences entre les deux registres sont signalées dans le
+        registre local du run.
+
+        Returns
+        -------
+        list[str]
+            Identifiants des runs ne possédant pas encore de statut de
+            tracking.
+        """
         runs_to_track = []
         
         report_mng_runs = report_manager.ReportManager("")
@@ -49,7 +83,13 @@ class TrackingPipeline:
         return runs_to_track
 
     def run(self):
-        
+        """
+        Tracke les runs en attente.
+
+        Chaque run est traité indépendamment. Une erreur sur un run est
+        enregistrée dans son registre et n'empêche pas le traitement des
+        autres runs.
+        """       
         config = ConfigManager(
             "config/paths.yaml"
         )

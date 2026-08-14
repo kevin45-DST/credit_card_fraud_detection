@@ -19,7 +19,14 @@ class ConfigManager:
         self,
         config_path: str | Path,
     ) -> None:
+        """
+        Initialise le gestionnaire de configuration.
 
+        Parameters
+        ----------
+        config_path : str | Path
+            Chemin vers le fichier YAML contenant la configuration.
+        """
         self.config_path = Path(config_path)
 
         with open(

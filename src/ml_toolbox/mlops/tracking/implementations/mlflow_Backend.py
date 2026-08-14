@@ -24,7 +24,9 @@ class MLFlowBackend(TrackingBackend):
     def __init__(
         self
     ):
-        
+        """
+        Initialise le backend MLflow et charge sa configuration.
+        """
         self.load_config()
         
         self.experiment_id = None
@@ -34,7 +36,12 @@ class MLFlowBackend(TrackingBackend):
         )
         
     def load_config(self) -> None:
-                
+        """
+        Charge la configuration MLflow depuis les fichiers du projet.
+
+        La configuration détermine notamment le nom de l'expérience,
+        l'emplacement de la base MLflow et le répertoire des artefacts.
+        """
         paths_config = ConfigManager(
             "config/paths.yaml"
         )
@@ -67,7 +74,12 @@ class MLFlowBackend(TrackingBackend):
     def initialize_experiment(
         self
     ) -> None:
-        
+        """
+        Initialise l'expérience MLflow.
+
+        L'expérience existante est réutilisée lorsqu'elle existe déjà ;
+        sinon, une nouvelle expérience est créée.
+        """
         experiment = mlflow.get_experiment_by_name(self.experiment_name)
 
         if experiment is None:
@@ -82,7 +94,14 @@ class MLFlowBackend(TrackingBackend):
         self,
         run_name: str,
     ) -> None:
+        """
+        Démarre un run MLflow.
 
+        Parameters
+        ----------
+        run_name : str
+            Nom du run à créer.
+        """
         mlflow.start_run(
             experiment_id=self.experiment_id,
             run_name=run_name
@@ -93,7 +112,14 @@ class MLFlowBackend(TrackingBackend):
         self,
         params: dict[str, Any],
     ) -> None:
+        """
+        Enregistre les paramètres d'un run MLflow.
 
+        Parameters
+        ----------
+        params : dict[str, Any]
+            Paramètres à enregistrer.
+        """
         mlflow.log_params(
             params
         )
@@ -103,7 +129,14 @@ class MLFlowBackend(TrackingBackend):
         self,
         metrics: dict[str, float],
     ) -> None:
+        """
+        Enregistre les métriques d'un run MLflow.
 
+        Parameters
+        ----------
+        metrics : dict[str, float]
+            Métriques à enregistrer.
+        """
         mlflow.log_metrics(
             metrics
         )
@@ -113,7 +146,14 @@ class MLFlowBackend(TrackingBackend):
         self,
         path: str,
     ) -> None:
+        """
+        Enregistre un artefact dans le run MLflow.
 
+        Parameters
+        ----------
+        path : str
+            Chemin vers l'artefact à enregistrer.
+        """
         mlflow.log_artifact(
             path
         )
@@ -122,5 +162,7 @@ class MLFlowBackend(TrackingBackend):
     def end_run(
         self,
     ) -> None:
-
+        """
+        Termine le run MLflow courant.
+        """
         mlflow.end_run()
