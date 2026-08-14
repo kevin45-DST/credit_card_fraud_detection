@@ -1,6 +1,6 @@
 # HephAIstOS
 
-HephAIstOS (Heuristic & Pipeline Artificial Intelligence Orchestration System) est un framework modulaire conçu pour structurer, standardiser et exécuter les pipelines de Machine Learning.
+HephAIstOS est un framework modulaire conçu pour structurer, standardiser et exécuter les pipelines de Machine Learning.
 
 ## 🎯 Philosophie du Projet & Abstraction Strict
 
