@@ -8,6 +8,7 @@ import time
 import numpy as np
 
 from config.config_manager import ConfigManager
+from src.ml_toolbox.transversal.logs.log_collector.log_collector_manager import LogCollectorManager
 from src.ml_toolbox.transversal.evaluation.evaluation_manager import EvaluationManager
 from src.ml_toolbox.data_science.training.training_manager import TrainingManager
 
@@ -79,16 +80,38 @@ class TrainingPipeline:
         
         self.evaluation_manager = None
         
+        self.logger = LogCollectorManager()
+        
     def run(self) -> None:
 
+        self.logger.info(message="Début du run", logger=self.__class__.__name__, run_id=self.run_id)
+        
         # Top démarrage entrainement
         start_time = time.perf_counter()
+        
+        self.logger.info(
+            message="Début du train", 
+            logger=self.__class__.__name__, 
+            run_id=self.run_id, 
+            context={"model_name":self.model_name})
+        
         self.training_manager.train()
         # top fin d'entrainement
         end_time = time.perf_counter()
         # calcul de la durée d'entrainement
         training_duration = end_time - start_time
+        self.logger.info(
+            message="Fin du train", 
+            logger=self.__class__.__name__, 
+            run_id=self.run_id, 
+            context={"model_name":self.model_name, "training_duration":training_duration})
                
+        self.logger.info(
+            message="Début de l'évaluation", 
+            logger=self.__class__.__name__, 
+            run_id=self.run_id, 
+            context={"model_name":self.model_name})
+        
         self.evaluation_manager = EvaluationManager.create(self.training_manager.model, self.model_name, self.dataset)
         
         evaluation = self.evaluation_manager.evaluate()
@@ -97,6 +120,20 @@ class TrainingPipeline:
         
         self.report_manager.generate_metrics(result, np.unique(self.dataset.y_test).tolist(), training_duration)
         
+        self.logger.info(
+            message="Fin de l'évaluation", 
+            logger=self.__class__.__name__, 
+            run_id=self.run_id, 
+            context={"model_name":self.model_name})
+        
         model_id = (f"{self.model_name}_{self.run_id}")
         
+        self.logger.info(
+            message="Persitance du modèle", 
+            logger=self.__class__.__name__, 
+            run_id=self.run_id, 
+            context={"model_id":model_id})
+        
         self.persistence_manager.save(self.training_manager.model, model_id)
+        
+        

@@ -67,8 +67,6 @@ for %%D in (
     data\raw
     data\interim
     data\processed
-    logs
-    models
 	output
     src
     tests

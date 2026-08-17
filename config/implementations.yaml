@@ -3,3 +3,6 @@ training:
 
 tracking:
   backend: mlflow
+
+log_storage:
+  backend: elasticsearch

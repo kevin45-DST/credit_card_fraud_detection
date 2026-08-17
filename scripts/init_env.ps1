@@ -64,9 +64,7 @@ Write-Host =====================================
 $folders = @(
     "data/raw",
     "data/processed",
-    "logs",
-    "models",
-	"outputs",
+	  "outputs",
     "notebooks",
     "src",
     "tests",

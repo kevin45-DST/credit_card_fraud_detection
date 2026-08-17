@@ -19,3 +19,6 @@ tracking:
   mlflow:
     root_folder: mlflow
     artifacts: artifacts
+
+logs:
+  root_folder: logs

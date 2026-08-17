@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import numpy as np
 
+from src.ml_toolbox.transversal.logs.log_collector.log_collector_manager import LogCollectorManager
 from src.ml_toolbox.transversal.reporting.report_manager import ReportManager, SearchTrainingResult
 from src.ml_toolbox.transversal.evaluation.evaluation_manager import EvaluationManager
 from src.ml_toolbox.data_science.best_model_research.strategy.gridcv_strategy import GridCVStrategy
@@ -67,7 +68,11 @@ class SearchPipeline:
         """
         self.dataset = dataset
         
-        self.report_manager = ReportManager(run_id = runId.create(), mode="search")
+        self.run_id = runId.create()
+        
+        self.report_manager = ReportManager(run_id = self.run_id, mode="search")
+        
+        self.logger = LogCollectorManager()
 
     def run(self) -> None:
         """
@@ -92,8 +97,17 @@ class SearchPipeline:
         """
         
         results = []
-
+        
+        self.logger.debug(message="Début du run", logger=self.__class__.__name__, run_id=self.run_id)
+        
         for model_name, param_grid in self.model_parameters.items():
+            
+            self.logger.debug(
+                message=f"Début du search model {model_name}", 
+                logger=self.__class__.__name__, 
+                run_id=self.run_id, 
+                context={"param_grid":param_grid}
+                )
             
             search_strategy = self.strategy(
                     model_name=model_name,
@@ -107,6 +121,19 @@ class SearchPipeline:
                 self.dataset.x_train,
                 self.dataset.y_train,
             )
+            
+            self.logger.debug(
+                message=f"Fin du search model {model_name}", 
+                logger=self.__class__.__name__, 
+                run_id=self.run_id, 
+                )
+            
+            self.logger.debug(
+                message=f"Début de l'évaluation model {model_name}", 
+                logger=self.__class__.__name__, 
+                run_id=self.run_id, 
+                context={"param_grid":param_grid}
+                )
             
             evaluation_manager = EvaluationManager.create(
                 model=search_strategy.best_model,
@@ -130,4 +157,12 @@ class SearchPipeline:
             
             results.append(search_result)
             
+            self.logger.debug(
+                message=f"Fin de l'évaluation model {model_name}", 
+                logger=self.__class__.__name__, 
+                run_id=self.run_id, 
+                )
+            
         self.report_manager.generate_metrics(results, np.unique(self.dataset.y_test).tolist())
+        
+        self.logger.debug(message="Fin du run", logger=self.__class__.__name__, run_id=self.run_id)

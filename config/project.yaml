@@ -15,3 +15,10 @@ mlflow:
   backend:
     type: sqlite
     name: mlflow.db
+
+logs:
+  file_size_max: 50MB
+  level: 1
+  storage:
+    backend: elasticsearch
+    url: "http://localhost:3100"

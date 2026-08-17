@@ -4,6 +4,7 @@
 from pathlib import Path
 
 from config.config_manager import ConfigManager
+from src.ml_toolbox.transversal.logs.log_collector.log_collector_manager import LogCollectorManager
 from src.ml_toolbox.transversal.reporting import report_manager
 from src.ml_toolbox.mlops.tracking.tracking_manager import TrackingManager
 
@@ -35,6 +36,8 @@ class TrackingPipeline:
         """
         self.tracking_manager = TrackingManager.create()
         
+        self.logger = LogCollectorManager()
+        
     def get_runs_to_track(self):
         """
         Identifie les runs qui doivent encore être trackés.
@@ -56,30 +59,65 @@ class TrackingPipeline:
         report_mng_runs = report_manager.ReportManager("")
     
         runs = report_mng_runs.get_runs_registry()
+        
+        self.logger.info(
+            message="Début de la collecte des runs à tracker",
+            logger=self.__class__.__name__,
+            )
 
         for run_global in runs["runs"]:
 
             report_mng_run = report_manager.ReportManager(run_id=run_global["run_id"])
             
             run_local = report_mng_run.get_run_registry()
+            
+            self.logger.debug(
+                message="Analyse du run",
+                run_id=run_global["run_id"],
+                logger=self.__class__.__name__,
+                context={"run_global":run_global, "run_local":run_local}
+                )
 
             if "tracking_status" not in run_global and "tracking_status" not in run_local:
                 runs_to_track.append(
                     run_global["run_id"]
                 )
             elif "tracking_status" not in run_global and "tracking_status" in run_local:
-                # Incohérence ->x ajout d'un warning
+                message = "Tracking_status absent du registry global, mais présent dans le registry local"
+                # Incohérence -> ajout d'un warning
                 report_mng_run.update_run_info(info_name="tracking_warning_message", 
-                                           info_value="Tracking_status absent du registry global, mais présent dans le registry local")
+                                           info_value=message)
+                self.logger.warning(
+                    message=message,
+                    run_id=run_global["run_id"],
+                    logger=self.__class__.__name__,
+                    )
             elif "tracking_status" in run_global and "tracking_status" not in run_local:
-                # Incohérence ->x ajout d'un warning
+                message = "Tracking_status absent du registry local, mais présent dans le registry global"
+                # Incohérence -> ajout d'un warning
                 report_mng_run.update_run_info(info_name="tracking_warning_message", 
-                                           info_value="Tracking_status absent du registry local, mais présent dans le registry global")
+                                           info_value=message)
+                self.logger.warning(
+                    message=message,
+                    run_id=run_global["run_id"],
+                    logger=self.__class__.__name__,
+                    )
             elif run_global["tracking_status"] != run_local["tracking_status"]:
-                # Incohérence ->x ajout d'un warning
+                message = f"Incohérence du tracking_status local ({run_local['tracking_status']})/global ({run_global['tracking_status']})"
+                # Incohérence -> ajout d'un warning
                 report_mng_run.update_run_info(info_name="tracking_warning_message", 
-                                           info_value=f"Incohérence du tracking_status local ({run_local['tracking_status']})/global ({run_global['tracking_status']})")
+                                           info_value=message)
+                self.logger.warning(
+                    message=message,
+                    run_id=run_global["run_id"],
+                    logger=self.__class__.__name__,
+                    )
                         
+                        
+        self.logger.info(
+            message="Fin de la collecte des runs à tracker",
+            logger=self.__class__.__name__,
+            )
         return runs_to_track
 
     def run(self):
@@ -99,15 +137,40 @@ class TrackingPipeline:
         
         # Initialisation de l'experience
         self.tracking_manager.initialize_experiment()
+        
+        self.logger.info(
+            message="Début du tracking des runs",
+            logger=self.__class__.__name__,
+            )
   
         for run_id in runs_to_track:
-        
+                    
             report_mng = report_manager.ReportManager(run_id=run_id)
+            
+            self.logger.info(
+                message="Début du tracking",
+                logger=self.__class__.__name__,
+                run_id=run_id,
+                context={"report":report_mng}
+                )
         
             try:
                 
+                self.logger.debug(
+                    message="Tracking en cours -> mise à jour des registry",
+                    logger=self.__class__.__name__,
+                    run_id=run_id
+                    )
+                
                 # Tracking en cours -> mise à jour des registry
                 report_mng.update_run_info(info_name="tracking_status", info_value="pending")
+                
+                self.logger.debug(
+                    message="Démarrage du tracking de l'expérience",
+                    logger=self.__class__.__name__,
+                    run_id=run_id,
+                    context={"info_name":"tracking_status", "info_value":"pending"}
+                    )
                 
                 # Démarrage du tracking de l'expérience
                 self.tracking_manager.start_run(run_id)
@@ -124,12 +187,31 @@ class TrackingPipeline:
                 
                 report = report_mng.get_run_report()
 
+                self.logger.debug(
+                    message="Enregistrement des métriques",
+                    logger=self.__class__.__name__,
+                    run_id=run_id
+                    )
+                
                 # Enregistrement des métriques
                 self.tracking_manager.metrics(report)
-
+                
+                self.logger.debug(
+                    message="Enregistrement des artefacts",
+                    logger=self.__class__.__name__,
+                    run_id=run_id
+                    )
+                
                 # Enregistrement des artefacts
                 self.tracking_manager.artifact(run_path / "artifacts")
                 
+                self.logger.debug(
+                    message="Tracking terminé -> mise à jour des registry",
+                    logger=self.__class__.__name__,
+                    run_id=run_id,
+                    context={"info_name":"tracking_status", "info_value":"success"}
+                    )
+                                                
                 # Tracking terminé -> mise à jour des registry
                 report_mng.update_run_info(info_name="tracking_status", info_value="success")
             
@@ -138,7 +220,24 @@ class TrackingPipeline:
                 report_mng.update_run_info(info_name="tracking_status", info_value="failed")
                 # Ajout de la cause de l'exception
                 report_mng.update_run_info(info_name="tracking_exception_message", info_value=str(e))
+                self.logger.error(
+                    message=str(e),
+                    logger=self.__class__.__name__,
+                    run_id=run_id,
+                    context={"report":report_mng}
+                    )
 
             finally:
                 # Fin du tracking
                 self.tracking_manager.end_run()
+                
+            self.logger.info(
+                message="Fin du tracking",
+                logger=self.__class__.__name__,
+                run_id=run_id
+                )
+        
+        self.logger.info(
+            message="Fin du tracking des runs",
+            logger=self.__class__.__name__,
+            )
