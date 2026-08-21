@@ -32,7 +32,7 @@ class MLFlowBackend(TrackingBackend):
         self.experiment_id = None
 
         mlflow.set_tracking_uri(
-            self.database_uri
+            self.tracking_uri
         )
         
     def load_config(self) -> None:
@@ -42,33 +42,13 @@ class MLFlowBackend(TrackingBackend):
         La configuration détermine notamment le nom de l'expérience,
         l'emplacement de la base MLflow et le répertoire des artefacts.
         """
-        paths_config = ConfigManager(
-            "config/paths.yaml"
-        )
         
         project_config = ConfigManager(
             "config/project.yaml"
         )
-        
-        project_root_folder = Path(paths_config.get('project.root_folder'))
-        
-        mlflow_root_folder = (
-                        project_root_folder / 
-                        paths_config.get('tracking.root_folder') /
-                        paths_config.get('tracking.mlflow.root_folder')
-                      )
-
-        artifact_path = mlflow_root_folder / paths_config.get('tracking.mlflow.artifacts')
-        
-        artifact_path.mkdir(parents=True, exist_ok=True)
 
         self.experiment_name = project_config.get("project.name")
-        self.database_uri = (
-                            f"{project_config.get('mlflow.backend.type')}"
-                            ":///"
-                            f"{mlflow_root_folder / project_config.get('mlflow.backend.name')}"
-                            )
-        self.artifact_location = "file:///" + str(artifact_path).replace("\\", "/")
+        self.tracking_uri = project_config.get("tracking.uri")
 
         
     def initialize_experiment(
@@ -84,8 +64,7 @@ class MLFlowBackend(TrackingBackend):
 
         if experiment is None:
             self.experiment_id = mlflow.create_experiment(
-                name=self.experiment_name,
-                artifact_location=self.artifact_location,
+                name=self.experiment_name
             )
         else:
             self.experiment_id = experiment.experiment_id      

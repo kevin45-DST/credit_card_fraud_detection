@@ -56,10 +56,12 @@ class ConfigManager:
         Any
             Valeur associée.
         """
+        try:
+            value = self.config
 
-        value = self.config
+            for item in key.split("."):
+                value = value[item]
 
-        for item in key.split("."):
-            value = value[item]
-
-        return value
+            return value
+        except:
+            return ""

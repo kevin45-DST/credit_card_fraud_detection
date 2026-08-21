@@ -1,8 +1,0 @@
-training:
-  backend: scikitlearn
-
-tracking:
-  backend: mlflow
-
-log_storage:
-  backend: elasticsearch

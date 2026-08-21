@@ -1,6 +1,7 @@
 @echo off
 
 cd ..
+cd ..
 
 for %%I in (.) do set ProjectName=%%~nxI
 

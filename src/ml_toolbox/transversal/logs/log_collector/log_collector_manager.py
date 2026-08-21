@@ -57,7 +57,7 @@ class LogCollectorManager:
         """
         paths_config = ConfigManager("config/paths.yaml")
         project_config = ConfigManager("config/project.yaml")
-        log_mapping = ConfigManager("config/mappings/log.yaml")
+        log_mapping = ConfigManager("config/mappings/logs.yaml")
         
         self.log_level = project_config.get("logs.level")
         self.log_levels_mapping = log_mapping.get("log_levels")

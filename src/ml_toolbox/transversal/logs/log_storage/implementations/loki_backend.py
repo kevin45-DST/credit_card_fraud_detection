@@ -43,10 +43,10 @@ class LokiBackend(LogStorageBackend):
         Args:
             log: Log à stocker.
         """
-        print("Store backend")
+
         timestamp = self._get_timestamp(log)
         payload = self._build_payload(log, timestamp)
-        print(f"{self._push_url = }, {payload = }")
+
         request = Request(
             self._push_url,
             data=json.dumps(payload).encode("utf-8"),
@@ -57,9 +57,7 @@ class LokiBackend(LogStorageBackend):
         )
 
         with urlopen(request) as response:
-            #response.read()
-            print(f"Loki HTTP status: {response.status}")
-            print(f"Loki response: {response.read().decode('utf-8')}")
+            response.read()
 
     def close(self) -> None:
         """Ferme le backend Loki."""

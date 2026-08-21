@@ -26,16 +26,16 @@ class LogStorageManager:
             Gestionnaire de logstorage configuré.
         """
     
-        implementations_config = ConfigManager(
-            "config/implementations.yaml"
+        project_config = ConfigManager(
+            "config/project.yaml"
         )
     
         mapping_config = ConfigManager(
             "config/mappings/logs.yaml"
         )
     
-        backend_name = implementations_config.get(
-            "log_storage.backend"
+        backend_name = project_config.get(
+            "logs.storage.backend"
         )
     
         backend_module = mapping_config.get(

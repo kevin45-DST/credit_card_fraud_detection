@@ -95,7 +95,7 @@ class MetricsLoader:
             / "confusion_matrix"
             / f"{run_id}_confusion_matrix.json"
         )
-        print(f"{run_id = }")
+
         with open(
             file_path,
             encoding="utf-8",

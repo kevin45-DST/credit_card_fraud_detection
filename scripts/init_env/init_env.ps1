@@ -1,4 +1,5 @@
 Set-Location ..
+Set-Location ..
 
 $ProjectName = Split-Path -Leaf $PWD
 

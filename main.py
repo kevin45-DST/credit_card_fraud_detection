@@ -108,10 +108,10 @@ def log():
     print("Log finished.")
 
 def main():
-    #search()
-    #train()
+    search()
+    train()
     
-    #track()
+    track()
     
     log()
 

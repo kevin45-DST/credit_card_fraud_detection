@@ -1,109 +1,103 @@
-# ==============
-# Docker Compose
-# ==============
-
 services:
 
-  # =======
-  # Service
-  # =======
-  <service_name>:
+  # =============================================================================
+  # Application
+  # =============================================================================
 
-    # -----
-    # Build
-    # -----
+  hephaistos:
     build:
       context: .
-      dockerfile: <Dockerfile>
-
-      # Optional
+      dockerfile: Dockerfile
       args:
-        <ARG_NAME>: <value>
+        ENVIRONMENT: docker
 
-    # Alternative to build
-    # image: <image>:<tag>
+    container_name: hephaistos
 
-    # ---------
-    # Container
-    # ---------
-    container_name: <container_name>
-    hostname: <hostname>
-
-    # --------------
-    # Restart policy
-    # --------------
-    restart: <no|always|unless-stopped|on-failure>
-
-    # ---------------------
-    # Environment variables
-    # ---------------------
-    environment:
-      <ENV_NAME>: <value>
-      <ENV_NAME>: <value>
-
-    # Or
-    # env_file:
-    #   - .env
-
-    # -----
-    # Ports
-    # -----
-    ports:
-      - "<host_port>:<container_port>"
-
-    # Exemple :
-    # - "8000:8000"
-
-    # -------
-    # Volumes
-    # -------
-    volumes:
-      - ./<host_directory>:/<container_directory>
-      - ./<config_file>:<container_path>
-
-    # --------
-    # Networks
-    # --------
-    networks:
-      - <network_name>
-
-    # ------------
-    # Dependencies
-    # ------------
     depends_on:
-      - <dependency_service>
+      - mlflow
+      - elasticsearch
 
-    # ----------------------
-    # Healthcheck (optional)
-    # ----------------------
-    healthcheck:
-      test: ["CMD", "<healthcheck_command>"]
-      interval: 30s
-      timeout: 5s
-      retries: 3
+    volumes:
+      - ./data:/app/data
+      - ./models:/app/models
+      - ./outputs:/app/outputs
+      - ./logs:/app/logs
+      - ./reports:/app/reports
 
-    # --------------------------
-    # Startup command (optional)
-    # --------------------------
+    environment:
+      MLFLOW_TRACKING_URI: http://mlflow:5000
+      ELASTICSEARCH_HOST: http://elasticsearch:9200
+
+
+  # =============================================================================
+  # MLflow
+  # =============================================================================
+
+  mlflow:
+    image: ghcr.io/mlflow/mlflow:v3.10.1
+
+    container_name: mlflow
+
+    ports:
+      - "5000:5000"
+
     command: >
-      <command>
+      mlflow server
+      --host 0.0.0.0
+      --port 5000
+      --allowed-hosts "mlflow:5000,localhost:*"
+      --backend-store-uri sqlite:///mlflow.db
+      --artifacts-destination /mlflow/artifacts
 
-    # Exemple :
-    # command: >
-    #   uvicorn src.main:app --host 0.0.0.0 --port 8000
+    volumes:
+      - ./mlflow:/mlflow
+      - ./reports:/app/reports
 
-# ========
-# Networks
-# ========
-networks:
 
-  <network_name>:
-    driver: bridge
+  # =============================================================================
+  # Elasticsearch
+  # =============================================================================
 
-# =======
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:9.3.0
+
+    container_name: elasticsearch
+
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+
+    ports:
+      - "9200:9200"
+
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+
+
+  # =============================================================================
+  # Kibana
+  # =============================================================================
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:9.3.0
+
+    container_name: kibana
+
+    depends_on:
+      - elasticsearch
+
+    ports:
+      - "5601:5601"
+
+    environment:
+      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+
+
+# ===============================================================================
 # Volumes
-# =======
+# ===============================================================================
+
 volumes:
 
-  <volume_name>:
-```
+  elasticsearch_data:
