@@ -20,3 +20,7 @@ logs:
   storage:
     backend: elasticsearch
     url: http://localhost:9200
+llm:
+  backend: ollama
+  url: "http://localhost:11434"
+  model: "qwen3-coder:30b"

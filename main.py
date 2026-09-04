@@ -1,12 +1,16 @@
+from pathlib import Path
+
 from pandas import Series
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
 
+from src.agentic.agents.code_analysis import CodeAnalysis
+from src.agentic.llm.llm_manager import LLMManager
 from src.ml_pipeline.logging_pipeline import LoggingPipeline
 from src.ml_pipeline.tracking_pipeline import TrackingPipeline
 from src.ml_toolbox.data_science.data.dataset.dataset import Dataset
 from src.ml_toolbox.data_science.preprocessing.scaling.basic import BasicScaling
 from src.ml_pipeline.training_pipeline import TrainingPipeline
-from src.ml_pipeline.search_pipeline import SearchPipeline
+#from src.ml_pipeline.search_pipeline import SearchPipeline
 from src.ml_toolbox.data_science.preprocessing.balancing.basic import BasicBalancing
 
 import pandas as pd
@@ -61,17 +65,17 @@ def build_param_grids():
     }
 
     
-def search():
+#def search():
        
-    print("Starting search pipeline...")
+#    print("Starting search pipeline...")
 
-    dataset = build_datasets()
+#    dataset = build_datasets()
 
-    pipeline = SearchPipeline(dataset=dataset)
+#    pipeline = SearchPipeline(dataset=dataset)
 
-    pipeline.run()
+#    pipeline.run()
 
-    print("Search finished.")
+#    print("Search finished.")
     
 def train():
     
@@ -106,14 +110,36 @@ def log():
     log_pipeline.run()
     
     print("Log finished.")
+    
+def code_analysis():
+    
+    print("Starting code_analysis...")
+    
+    code_analysis = CodeAnalysis()
+    
+    source_code = Path("tests/code_to_analys.py").read_text(
+        encoding="utf-8"
+    )
+    
+    code_analysis.start()
+    
+    result = code_analysis.analyse(
+        paths=["src", "config"], 
+        report_path="analysis_report")
+
+    print(f"{result = }")
+    
+    print("code_analysis finished.")
 
 def main():
-    search()
-    train()
+    #search()
+    #train()
     
-    track()
+    #track()
     
-    log()
+    #log()
+    
+    code_analysis()
 
 if __name__ == "__main__":
     main()

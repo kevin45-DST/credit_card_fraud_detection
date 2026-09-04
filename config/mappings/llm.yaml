@@ -1,0 +1,3 @@
+ollama:
+  module: src.agentic.llm.implementations.ollama_backend
+  class: OllamaBackend
